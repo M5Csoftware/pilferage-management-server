@@ -31,6 +31,10 @@ export interface IShipment extends Document {
   weightLossPercentage?: number;
   flaggedReason?: string;
 
+  // Photo Evidence
+  weightInPhotoUrl?: string;
+  weightOutPhotoUrl?: string;
+
   createdAt: Date;
   updatedAt: Date;
 }
@@ -136,6 +140,12 @@ const ShipmentSchema = new Schema<IShipment>(
       type: Number,
     },
     flaggedReason: {
+      type: String,
+    },
+    weightInPhotoUrl: {
+      type: String,
+    },
+    weightOutPhotoUrl: {
       type: String,
     },
   },

@@ -16,6 +16,7 @@ const RecordInboundSchema = z.object({
   inboundOperator: z.string().default('Station Operator'),
   sealNumberIn: z.string().optional(),
   inboundNotes: z.string().optional(),
+  weightInPhotoUrl: z.string().optional(),
 });
 
 const RecordOutboundDispatchSchema = z.object({
@@ -23,6 +24,7 @@ const RecordOutboundDispatchSchema = z.object({
   outboundOperator: z.string().default('Dispatch Officer'),
   sealNumberOut: z.string().optional(),
   outboundNotes: z.string().optional(),
+  weightOutPhotoUrl: z.string().optional(),
   forceOverride: z.boolean().optional().default(false), // Optional supervisor override
 });
 
@@ -178,7 +180,7 @@ export async function shipmentRoutes(fastify: FastifyInstance) {
         });
       }
 
-      const { weightOutKg, outboundOperator, sealNumberOut, outboundNotes, forceOverride } = parseResult.data;
+      const { weightOutKg, outboundOperator, sealNumberOut, outboundNotes, weightOutPhotoUrl, forceOverride } = parseResult.data;
 
       const shipment = await ShipmentModel.findOne({
         $or: [{ _id: id.match(/^[0-9a-fA-F]{24}$/) ? id : null }, { shipmentCode: id }, { trackingNumber: id }],
@@ -204,6 +206,9 @@ export async function shipmentRoutes(fastify: FastifyInstance) {
       shipment.weightDiffKg = diffKg;
       shipment.weightLossPercentage = lossPercentage;
       shipment.outboundNotes = outboundNotes;
+      if (weightOutPhotoUrl) {
+        shipment.weightOutPhotoUrl = weightOutPhotoUrl;
+      }
 
       if (exceedsTolerance && !forceOverride) {
         shipment.status = 'PILFERAGE_FLAGGED';
